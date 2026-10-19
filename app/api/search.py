@@ -1,5 +1,5 @@
 """HTTP adapter for semantic search."""
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.application.search_service import SearchService
 
@@ -13,7 +13,10 @@ def search(
     limit: int = Query(10, ge=1, le=20),
 ) -> dict:
     service: SearchService = request.app.state.search_service
-    response = service.search(q, limit)
+    try:
+        response = service.search(q, limit)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
     return {
         "query": response.query,
         "results": [
