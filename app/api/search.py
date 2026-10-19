@@ -12,6 +12,9 @@ def search(
     q: str = Query(..., min_length=1),
     limit: int = Query(10, ge=1, le=20),
 ) -> dict:
+    if not q.strip():
+        raise HTTPException(status_code=422, detail="q must not be empty")
+
     service: SearchService = request.app.state.search_service
     try:
         response = service.search(q, limit)
