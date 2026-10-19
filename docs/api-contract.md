@@ -1,49 +1,41 @@
 # API contract
 
-This document describes a future endpoint only. The endpoint is not implemented
-in this milestone.
+## Semantic post search
 
-## Create a post
+`GET /search?q=<non-empty query>&limit=<1..20>`
 
-### Request
-
-`POST /posts`
-
-Request body:
-
-```json
-{
-  "user_id": 1,
-  "content": "Hello from InstaKill"
-}
-```
-
-The client must provide a positive integer `user_id` for an existing user and a
-non-blank string `content`. Whitespace around meaningful content is allowed and
-is preserved by the application service.
+The endpoint searches the seeded posts using embeddings from the pretrained
+`sentence-transformers/all-MiniLM-L6-v2` encoder.
 
 ### Successful response
 
-Status: `201 Created`
+Status: `200 OK`
 
 ```json
 {
-  "id": 42,
-  "user_id": 1,
-  "content": "Hello from InstaKill",
-  "created_at": "2026-10-19T16:45:35Z"
+  "query": "similarity search",
+  "results": [
+    {
+      "post_id": 2,
+      "user_id": 1,
+      "content": "does anyone else think the feed is chronological only? boring",
+      "score": 0.7312
+    }
+  ]
 }
 ```
 
-`id` and `created_at` are assigned by the persistence boundary. The application
-service currently returns a domain `Post` value without writing to SQLite.
+Results contain at most `limit` posts, are ordered by descending cosine
+similarity, and use ascending `post_id` to break equal scores.
 
 ### Validation and error cases
 
-- `400 Bad Request`: malformed JSON or a request body with the wrong field
-  types.
-- `422 Unprocessable Entity`: `user_id` is missing, not a positive integer, or
-  `content` is missing, not a string, or contains only whitespace.
-- `404 Not Found`: no user exists for the supplied `user_id`.
-- `500 Internal Server Error`: an unexpected persistence failure. The response
-  must not expose database details.
+- `422 Unprocessable Entity`: `q` is missing or empty, or `limit` is not an
+  integer from `1` through `20`.
+- `500 Internal Server Error`: an unexpected database or encoder failure. The
+  response must not expose implementation details.
+
+The HTTP adapter only parses parameters and formats responses. SQLite access is
+in `app/search/repository.py`, encoding is behind
+`SentenceTransformerEncoder`, and ranking is the pure `top_k_by_cosine`
+function in `app/search/retrieval.py`.

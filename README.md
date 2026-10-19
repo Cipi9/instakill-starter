@@ -24,6 +24,20 @@ python scripts/seed_db.py
 pytest
 ```
 
+## Semantic search
+
+Week 3 adds `GET /search?q=<query>&limit=<1..20>`. Run the seed script before
+searching if the database does not already contain posts:
+
+```bash
+python scripts/seed_db.py
+```
+
+The first search lazily loads `sentence-transformers/all-MiniLM-L6-v2`, reads
+the posts through the repository boundary, and builds an in-memory embedding
+index. New posts will require an explicit index refresh; a future CRUD service
+can provide that refresh rather than coupling SQLite writes to retrieval.
+
 ## Milestones (see masterplan.md for full details)
 
 W1 Repo+API → W3 CRUD+DB → W4 Feed v0 → W7 Baseline+eval plan → W9 ML+pretrained feature → W11 Profile+optimize → W13 Feature freeze+E2E → W14 Red-team+Demo Day.
