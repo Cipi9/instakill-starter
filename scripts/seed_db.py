@@ -23,6 +23,26 @@ def seed() -> None:
             conn.execute(
                 "INSERT INTO post (user_id, content) VALUES (?, ?)", (user_id, content)
             )
+        conn.executemany(
+            "INSERT OR IGNORE INTO follow (follower_id, followed_id) VALUES (?, ?)",
+            [(1, 2), (1, 3), (2, 1), (3, 4), (4, 5)],
+        )
+        post_ids = conn.execute(
+            "SELECT id, user_id FROM post ORDER BY id"
+        ).fetchall()
+        likes = [
+            (1, row["id"])
+            for row in post_ids
+            if row["user_id"] == 2 and row["id"] % 2 == 0
+        ]
+        likes.extend(
+            (2, row["id"])
+            for row in post_ids
+            if row["user_id"] in {1, 4} and row["id"] % 2 == 1
+        )
+        conn.executemany(
+            "INSERT OR IGNORE INTO like (user_id, post_id) VALUES (?, ?)", likes
+        )
         conn.commit()
     print(f"Seeded {len(USERS)} users and {len(POSTS)} posts.")
 
