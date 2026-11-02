@@ -4,3 +4,6 @@ __pycache__/
 .pytest_cache/
 lab-04-build-the-feed/ml-latest-small.zip
 lab-04-build-the-feed/ml-latest-small/
+
+lab-05-learn-the-scorer/ml-latest-small/
+lab-05-learn-the-scorer/ml-latest-small.zip

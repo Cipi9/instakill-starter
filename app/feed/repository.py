@@ -1,5 +1,6 @@
 """SQLite reads used by the feed service."""
 from collections.abc import Sequence
+from datetime import datetime
 
 from app.db.database import get_connection
 from app.domain.models import Post
@@ -66,3 +67,13 @@ class FeedRepository:
                 tuple(post_ids),
             ).fetchall()
         return {row["post_id"]: row["count"] for row in rows}
+
+    def user_like_count(self, user_id: int) -> int:
+        with get_connection() as connection:
+            row = connection.execute(
+                "SELECT COUNT(*) AS count FROM like WHERE user_id = ?", (user_id,)
+            ).fetchone()
+        return int(row["count"])
+
+    def lifetime_like_counts(self, post_ids: Sequence[int]) -> dict[int, int]:
+        return self.like_counts(post_ids)

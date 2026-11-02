@@ -42,7 +42,7 @@ function in `app/search/retrieval.py`.
 
 ## Feed
 
-`GET /feed?user_id=<int>&limit=<1..50>&strategy=for_you|chronological`
+`GET /feed?user_id=<int>&limit=<1..50>&strategy=for_you|chronological|learned`
 
 `user_id` is required. `limit` defaults to `20`; `strategy` defaults to
 `for_you`. `for_you` returns posts from followed authors, or all other authors
@@ -51,6 +51,11 @@ posts. It includes a numeric `score` based on freshness, followed-author
 affinity, and normalized like popularity. `chronological` uses the same
 candidate policy and orders by newest `created_at`; equal timestamps use
 ascending `post_id`.
+
+`learned` uses the Week 5 NumPy MLP trained on six signals
+(`freshness`, `affinity`, `popularity`, `activity`, `lifetime`, and `age`).
+It returns the same candidate set and orders by the model's predicted
+like probability.
 
 ### Successful response
 

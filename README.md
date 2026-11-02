@@ -40,7 +40,7 @@ can provide that refresh rather than coupling SQLite writes to retrieval.
 
 ## Feed (Week 4)
 
-`GET /feed?user_id=<int>&limit=<1..50>&strategy=for_you|chronological`
+`GET /feed?user_id=<int>&limit=<1..50>&strategy=for_you|chronological|learned`
 returns a deterministic feed. `for_you` excludes the user's own and already
 liked posts, then ranks posts using:
 
@@ -57,6 +57,10 @@ The feed's ranker uses a heap, so one request costs `O(C log k)` time and
 `O(k)` ranking memory for `C` candidates and limit `k` (candidate reads and
 signal calculation add `O(C)`). Like counts would be the first part to
 precompute for a larger database.
+
+The `learned` strategy uses the Week 5 NumPy MLP exported in
+`app/feed/like_model.npz`. It scores the six signals from the lab:
+freshness, affinity, popularity, activity, lifetime, and age.
 
 ## Milestones (see masterplan.md for full details)
 
