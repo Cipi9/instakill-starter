@@ -1,0 +1,13 @@
+user_id,strategy,ndcg_at_10,n_relevant,user_group
+3,chronological,0.647939623894138,8,casual (10-49)
+3,for_you,0.647939623894138,8,casual (10-49)
+3,learned,0.647939623894138,8,casual (10-49)
+3,popularity,0.647939623894138,8,casual (10-49)
+4,chronological,0.41253177989255346,8,casual (10-49)
+4,for_you,0.41253177989255346,8,casual (10-49)
+4,learned,0.41253177989255346,8,casual (10-49)
+4,popularity,0.41253177989255346,8,casual (10-49)
+5,chronological,0.41253177989255346,8,casual (10-49)
+5,for_you,0.41253177989255346,8,casual (10-49)
+5,learned,0.41253177989255346,8,casual (10-49)
+5,popularity,0.41253177989255346,8,casual (10-49)

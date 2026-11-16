@@ -28,7 +28,11 @@ class FeedService:
         self._learned_scorer = learned_scorer or LearnedScorer()
 
     def get_feed(
-        self, user_id: int, limit: int, strategy: str
+        self,
+        user_id: int,
+        limit: int,
+        strategy: str,
+        now: datetime | None = None,
     ) -> list[RankedPost | Post]:
         if not self._repository.user_exists(user_id):
             raise UnknownUserError("user_id does not exist")
@@ -48,7 +52,7 @@ class FeedService:
                 key=lambda post: (-self._created_at(post).timestamp(), post.id or 0),
             )[:limit]
 
-        now = datetime.now(timezone.utc)
+        now = now or datetime.now(timezone.utc)
         if strategy == "learned":
             return self._learned_feed(candidates, user_id, followed_ids, now, limit)
 

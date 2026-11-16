@@ -62,6 +62,22 @@ The `learned` strategy uses the Week 5 NumPy MLP exported in
 `app/feed/like_model.npz`. It scores the six signals from the lab:
 freshness, affinity, popularity, activity, lifetime, and age.
 
+## Offline evaluation (Week 7)
+
+Install the evaluation-only dependencies and run the deterministic time-split
+replay with:
+
+```bash
+pip install -e ".[eval]"
+python scripts/evaluate.py --out reports
+```
+
+The command evaluates `chronological`, `popularity`, `for_you`, and `learned`
+against a historical database snapshot and writes `eval_results.csv`,
+`baseline_table.md`, and a self-contained `dashboard.html` to `reports/`.
+The full protocol, metric, bootstrap intervals, slices, and limitations are
+documented in [`docs/evaluation-protocol.md`](docs/evaluation-protocol.md).
+
 ## Milestones (see masterplan.md for full details)
 
 W1 Repo+API → W3 CRUD+DB → W4 Feed v0 → W7 Baseline+eval plan → W9 ML+pretrained feature → W11 Profile+optimize → W13 Feature freeze+E2E → W14 Red-team+Demo Day.

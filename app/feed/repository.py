@@ -1,28 +1,30 @@
 """SQLite reads used by the feed service."""
 from collections.abc import Sequence
-from datetime import datetime
 
 from app.db.database import get_connection
 from app.domain.models import Post
 
 
 class FeedRepository:
+    def __init__(self, db_path: str | None = None):
+        self._db_path = db_path
+
     def user_exists(self, user_id: int) -> bool:
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             row = connection.execute(
                 "SELECT 1 FROM user WHERE id = ?", (user_id,)
             ).fetchone()
         return row is not None
 
     def liked_post_ids(self, user_id: int) -> set[int]:
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             rows = connection.execute(
                 "SELECT post_id FROM like WHERE user_id = ?", (user_id,)
             ).fetchall()
         return {row["post_id"] for row in rows}
 
     def followed_author_ids(self, user_id: int) -> set[int]:
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             rows = connection.execute(
                 "SELECT followed_id FROM follow WHERE follower_id = ?", (user_id,)
             ).fetchall()
@@ -31,7 +33,7 @@ class FeedRepository:
     def list_candidates(
         self, user_id: int, followed_ids: set[int], liked_post_ids: set[int]
     ) -> Sequence[Post]:
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             if followed_ids:
                 placeholders = ",".join("?" for _ in followed_ids)
                 query = (
@@ -60,7 +62,7 @@ class FeedRepository:
         if not post_ids:
             return {}
         placeholders = ",".join("?" for _ in post_ids)
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             rows = connection.execute(
                 "SELECT post_id, COUNT(*) AS count FROM like "
                 f"WHERE post_id IN ({placeholders}) GROUP BY post_id",
@@ -69,7 +71,7 @@ class FeedRepository:
         return {row["post_id"]: row["count"] for row in rows}
 
     def user_like_count(self, user_id: int) -> int:
-        with get_connection() as connection:
+        with get_connection(self._db_path) as connection:
             row = connection.execute(
                 "SELECT COUNT(*) AS count FROM like WHERE user_id = ?", (user_id,)
             ).fetchone()
